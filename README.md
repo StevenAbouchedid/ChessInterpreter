@@ -1,5 +1,10 @@
 # 354-Final-Project
 
+## How to Run
+1. Clone the repository on your machine
+2. Download Visual Studio. Make sure to include the .NET compiler with your installation.
+3. Open the .sln file with Visual Studio
+
 ## Milestone 1: Create a parser for Algebraic Chess Notation - 12/10
 Communicating chess moves could be very simple. Simply state the square the piece is moving from, and the square the piece is moving to. However, The Standard Chess Notation (aka Algebraic Chess Notation) includes contextual information about the move, such as whether or not a piece was taken, what the piece was that took the move, and many other things relating to the game state. 
 
