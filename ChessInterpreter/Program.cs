@@ -12,7 +12,8 @@ namespace ChessInterpreter
             board.PrettyPrintChessBoard();
             Console.WriteLine();
 
-            board.StandardAlgebraicNotationParser("Ke4");
+            // Milestone 1
+            Board.StandardAlgebraicNotationParser("Nh8", PieceColor.White);
 
             //while (true) {
             //    Console.WriteLine("Enter a move in algebraic chess notation: ");
