@@ -33,3 +33,6 @@ There is also the unique symbol for castling. This symbol is a O-O for king-side
 
 ### Description of Submission
 The process for parsing is rather simple. We simply have to identify each of the sections of a chess move in the standard notation, and consider any contingincies such as whether or not a certain section is present in this chess move. We dont have to check the validity of the move, as we dont have any context of the chess game in this stage of the interpreter. This makes our job easy, as we only need to gather the information given to us for now. 
+
+## Milestone 2: Create an interpreter for Algebraic Chess Notation - 12/13
+
