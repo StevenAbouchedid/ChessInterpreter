@@ -40,10 +40,13 @@ namespace ChessInterpreter
             }
         }
 
-        public static void StandardAlgebraicNotationParser(string move, PieceColor color)
+        public static PieceMove StandardAlgebraicNotationParser(string move, PieceColor color)
         {
             // There are 6 sections in the algebraic chess notation
             // {Piece}{from}{takes}{to}{promotion}{check}
+
+            PieceMove pieceMove = null;
+            PieceType pieceType = PieceType.None;
 
             string piece = "";
             string from = "";
@@ -73,7 +76,6 @@ namespace ChessInterpreter
                 }
                 
                 // Convert piece name to PieceType
-                PieceType pieceType;
                 if (piece == "K")
                 {
                     pieceType = PieceType.King;
@@ -139,18 +141,22 @@ namespace ChessInterpreter
                     to = move;
                 }
 
-                StandardAlgebraicNotationInterpreter(new PieceMove(
-                    from, 
-                    to, 
-                    takes != "" ? true : false, 
-                    promotion, 
-                    check != "" ? true : false, 
-                    checkmate != "" ? true : false, 
-                    QCastle, 
-                    KCastle,
-                    new ChessPiece(pieceType, color)
-                    ));
+
             }
+
+            pieceMove = new PieceMove(
+                from, 
+                to, 
+                takes != "" ? true : false, 
+                promotion, 
+                check != "" ? true : false, 
+                checkmate != "" ? true : false, 
+                QCastle, 
+                KCastle,
+                new ChessPiece(pieceType, color)
+                );
+
+            return pieceMove;
         }
 
         public static void StandardAlgebraicNotationInterpreter(PieceMove move)
@@ -964,6 +970,11 @@ namespace ChessInterpreter
             QCastle = qCastle;
             KCastle = kCastle;
             this.chessPiece = chessPiece;
+        }
+
+        public void printMove()
+        {
+            Console.WriteLine($"From: {From}, To: {To}, Takes: {Takes}, Promotion: {Promotion}, Check: {Check}, Checkmate: {Checkmate}, QCastle: {QCastle}, KCastle: {KCastle}");
         }
     }
 
