@@ -35,4 +35,7 @@ There is also the unique symbol for castling. This symbol is a O-O for king-side
 The process for parsing is rather simple. We simply have to identify each of the sections of a chess move in the standard notation, and consider any contingincies such as whether or not a certain section is present in this chess move. We dont have to check the validity of the move, as we dont have any context of the chess game in this stage of the interpreter. This makes our job easy, as we only need to gather the information given to us for now. 
 
 ## Milestone 2: Create an interpreter for Algebraic Chess Notation - 12/13
+The interpreter takes a lot more work than the parser. The interpreter involves taking the information gathered from the parser, and generating the possible solutions to the missing information. At the current stage of the program, the piece moves lack context of the board, while the ACN move syntax involves only specifying information when ambiguous. For instance, the move Qe8 does not specify at all how the queen gets to that position because that context isnt necessary with knowledge of the board state. If there are multiple queens that CAN make that move, then which queen is specified. 
+
+The interpreter in this program does not have context, so it will generate all possible moves that could have preceded the known move in the syntax. It does this by using rules of the game, including how the pieces move, and how many squares are on the board. The next milestone will involve putting all of this together and making a functioning chess program. 
 
