@@ -1,5 +1,11 @@
 # 354-Final-Project
 
+## IDENTIFYING INFORMATION
+* Full Name: Steven Abouchedid
+* Student ID: 2323527
+* Chapman Email: abouchedid@chapman.edu
+* Course Number and Section: CPSC 354-01
+
 ## How to Run
 1. Clone the repository on your machine
 2. Download Visual Studio. Make sure to include the .NET compiler with your installation.
