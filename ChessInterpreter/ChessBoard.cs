@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ChessInterpreter
 {
@@ -20,6 +23,105 @@ namespace ChessInterpreter
         Black          //2
     }
 
+    class Game
+    {
+        public PieceColor playerTurn;
+
+        public Board board;
+
+        public bool check;
+
+        public bool checkmate;
+
+        public bool isGameFinished;
+
+        public Game()
+        {
+            //Initialize new game values
+            playerTurn = PieceColor.White;
+            check = false;
+            checkmate = false;
+            isGameFinished = false;
+
+            //Initialize new game board
+            board = new Board();
+            board.InitializeDefaultBoard();
+        }
+
+        // This function will take as input a move in algebraic chess notation and compute the move and play it on the chess board. 
+        public void PlayMove(string ChessNotationString)
+        {
+            PieceMove parsedMove;
+
+
+            try
+            {
+               parsedMove = Board.StandardAlgebraicNotationParser(ChessNotationString, playerTurn);
+               
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Invalid move, please try again");
+                return;
+            }
+
+            
+            //need to continue work on PaesedMoveContextInterpreter to reduce down to one move. 
+
+
+        }
+
+        // Interprets a parsed move with the context of the current board state and plays the move on the board.
+        private void ParsedMoveContextInterpreter(PieceMove pieceMove)
+        {
+            PieceMove[] LegalMoves = Board.StandardAlgebraicNotationInterpreter(pieceMove);
+
+            
+        }
+
+        public bool CheckIfLegalMove(PieceMove pieceMove)
+        {
+            if (pieceMove == null)
+            {
+                return false;
+            }
+
+            BoardSquare destinationSquare = board.GetSquareByName(pieceMove.To);
+
+            if (destinationSquare == null)
+            {
+                return false;
+            }
+
+            if (destinationSquare.Piece.Color == playerTurn)
+            {
+                return false;
+            }
+
+            if (pieceMove.chessPiece.Type == PieceType.Pawn)
+                if (!pieceMove.PawnAttack)
+                    return false;
+
+            //need to consider checks
+            if (check)
+                if (CheckIfMoveRemovesCheck(board, pieceMove))
+                    return false;
+            
+
+            return true;
+
+        }
+
+        //Checks if the board is still in a checked state after a move
+        public bool CheckIfMoveRemovesCheck(Board currentBoard, PieceMove move)
+        {
+
+            return false;
+        }
+
+    }
+    
     class Board
     {
         public BoardSquare[,] Squares { get; set; }
@@ -27,17 +129,28 @@ namespace ChessInterpreter
         public Board()
         {
             Squares = new BoardSquare[8, 8];
-        }
-
-        public void Print()
-        {
-            for (int i = 0; i < Squares.GetLength(0); i++)
+            for (int i = 0; i < Squares.GetLength(0); ++i)
             {
-                for (int j = 0; j < Squares.GetLength(1); j++)
+                for (int j = 0; j < Squares.GetLength(1); ++j)
                 {
-                    Squares[i, j].Print();
+                    Squares[i, j] = new BoardSquare();
                 }
             }
+
+            InitializeSquareNames();
+        }
+
+        public BoardSquare GetSquareByName(string squareName)
+        {
+            foreach (BoardSquare square in Squares)
+            {
+                if (square.Position == squareName)
+                {
+                    return square;
+                }
+            }
+
+            return null;
         }
 
         public static PieceMove StandardAlgebraicNotationParser(string move, PieceColor color)
@@ -159,8 +272,10 @@ namespace ChessInterpreter
             return pieceMove;
         }
 
-        public static void StandardAlgebraicNotationInterpreter(PieceMove move)
+        public static PieceMove[] StandardAlgebraicNotationInterpreter(PieceMove move)
         {
+            PieceMove[] moves = new PieceMove[1];
+            
             string fromSquare;
             string toSquare;
 
@@ -184,15 +299,17 @@ namespace ChessInterpreter
             {
                 fromSquare = "O-O";
                 toSquare = "O-O";
+                return moves;
             }
             else if (move.KCastle)
             {
                 fromSquare = "O-O-O";
                 toSquare = "O-O-O";
+                return moves;
             }
             else
             {
-                CalculateMoves(toSquare, fromSquare, move.chessPiece);
+                return CalculateMoves(toSquare, fromSquare, move.chessPiece);
             }
 
         }
@@ -225,7 +342,6 @@ namespace ChessInterpreter
 
             return moves;
         }
-
         private static PieceMove[] CalculatePawnMoves(string toSquare, string fromSquare, ChessPiece chessPiece)
         {
             PieceMove[] moves = new PieceMove[0];
@@ -244,6 +360,9 @@ namespace ChessInterpreter
                     moves[2] = new PieceMove(Convert.ToChar(toSquare[0] + 1)+"3", toSquare, false, "", false, false, false, false, chessPiece);
                     moves[3] = new PieceMove(toSquare[0]+"3", toSquare, false, "", false, false, false, false, chessPiece);
 
+                    moves[1].PawnAttack = true;
+                    moves[2].PawnAttack = true;
+
                 }
                 else
                 {
@@ -251,6 +370,9 @@ namespace ChessInterpreter
                     moves[0] = new PieceMove(toSquare[0]+(toSquareY-1).ToString(), toSquare, false, "", false, false, false, false, chessPiece);
                     moves[1] = new PieceMove(Convert.ToChar(toSquare[0] - 1)+(toSquareY-1).ToString(), toSquare, false, "", false, false, false, false, chessPiece);
                     moves[2] = new PieceMove(Convert.ToChar(toSquare[0] + 1)+(toSquareY-1).ToString(), toSquare, false, "", false, false, false, false, chessPiece);
+
+                    moves[1].PawnAttack = true;
+                    moves[2].PawnAttack = true;
                 }
             }
             else
@@ -262,6 +384,9 @@ namespace ChessInterpreter
                     moves[1] = new PieceMove(Convert.ToChar(toSquare[0] - 1)+"6", toSquare, false, "", false, false, false, false, chessPiece);
                     moves[2] = new PieceMove(Convert.ToChar(toSquare[0] + 1)+"6", toSquare, false, "", false, false, false, false, chessPiece);
                     moves[3] = new PieceMove(toSquare[0]+"7", toSquare, false, "", false, false, false, false, chessPiece);
+
+                    moves[1].PawnAttack = true;
+                    moves[2].PawnAttack = true;
                 }
                 else
                 {
@@ -269,6 +394,9 @@ namespace ChessInterpreter
                     moves[0] = new PieceMove(toSquare[0]+(toSquareY+1).ToString(), toSquare, false, "", false, false, false, false, chessPiece);
                     moves[1] = new PieceMove(Convert.ToChar(toSquare[0] - 1)+(toSquareY+1).ToString(), toSquare, false, "", false, false, false, false, chessPiece);
                     moves[2] = new PieceMove(Convert.ToChar(toSquare[0] + 1)+(toSquareY+1).ToString(), toSquare, false, "", false, false, false, false, chessPiece);
+
+                    moves[1].PawnAttack = true;
+                    moves[2].PawnAttack = true;
                 }
             }
 
@@ -727,6 +855,155 @@ namespace ChessInterpreter
 
             return moves;
         }
+        public bool CheckForChecks(PieceColor color)
+        {
+            BoardSquare CurrentKing = FindChessPieceOnBoard(new ChessPiece(PieceType.King, color))[0];
+
+            for (int i = 0; i < Squares.GetLength(0); ++i)
+            {
+                for (int j = 0; j < Squares.GetLength(1); ++j)
+                {
+                    if (Squares[i, j].Piece.Color != color)
+                    {
+                        if (Squares[i, j].Piece.Type != PieceType.King && Squares[i, j].Piece.Type != PieceType.None)
+                        {
+                            if (CheckIfPieceIsAttacked(CurrentKing, Squares[i, j]))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        //Function to check if a square is in an array of squares
+        //Used to check if a piece is being attacked
+        //For Rooks, Bishops, and Queens, will also filter out moves if a piece is in the way. 
+        public bool CheckIfPieceIsAttacked(BoardSquare pieceBeingAttacked, BoardSquare attackingPiece)
+        {
+            if (attackingPiece.Piece.Type == PieceType.Pawn || attackingPiece.Piece.Type == PieceType.Knight)
+            {
+                //Gets a list of squares that the pieces attack
+                string[] AttackingSquares = attackingPiece.GetAttackingPositions();
+
+                //Checks if the coordinates of the piece being attacked is included in any of those coordinates
+                for (int i = 0; i < AttackingSquares.Length; ++i)
+                {
+                    if (pieceBeingAttacked.Position == AttackingSquares[i])
+                    {
+                        return true;
+                    }
+                }
+            }
+            else //For Bishops, Rooks, and Queens, need to consider pieces blocking the view of the attacking piece. 
+            {
+                //Gets a list of squares that the pieces attack
+                string[] AttackingSquares = attackingPiece.GetAttackingPositions();
+
+                //Checks if the coordinates of the piece being attacked is included in any of those coordinates
+                for (int i = 0; i < AttackingSquares.Length; ++i)
+                {
+                    if (pieceBeingAttacked.Position == AttackingSquares[i])
+                    {
+                        string[] InbetweenSquares = GetInbetweenSquares(pieceBeingAttacked.Position, attackingPiece.Position);
+
+                        for (int j = 0; j < InbetweenSquares.Length; ++i)
+                        {
+                            //Check if inbetween Squares are empty
+                            if (GetSquareByName(InbetweenSquares[j]).Piece.Type != PieceType.None) 
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+                }
+                
+            }
+
+            return false;
+        }
+
+        //This function uses the Bresenham's line algorithm to calculate the intermediate coordinates
+        private string[] GetInbetweenSquares(string square1, string square2)
+        {
+            //Convert the square strings into coordinates
+            (int x1, int y1) = SquareNameToCoordinates(square1);
+            (int x2, int y2) = SquareNameToCoordinates(square2);
+
+            // Initialize a list to store the coordinates
+            var coordinates = new List<(int x, int y)>();
+
+            // Handle the case where the points are the same
+            if (x1 == x2 && y1 == y2)
+            {
+                coordinates.Add((x1, y1));
+            }
+
+            // Handle the case where the points have the same x-coordinate
+            else if (x1 == x2)
+            {
+                int start = Math.Min(y1, y2);
+                int end = Math.Max(y1, y2);
+                for (int y = start; y <= end; y++)
+                {
+                    coordinates.Add((x1, y));
+                }
+            }
+
+            // Handle the case where the points have the same y-coordinate
+            else if (y1 == y2)
+            {
+                int start = Math.Min(x1, x2);
+                int end = Math.Max(x1, x2);
+                for (int x = start; x <= end; x++)
+                {
+                    coordinates.Add((x, y1));
+                }
+            }
+
+            else // Handle the case where the points have different x- and y-coordinates
+            {
+                int dx = Math.Abs(x2 - x1);
+                int dy = Math.Abs(y2 - y1);
+                int sx = x1 < x2 ? 1 : -1;
+                int sy = y1 < y2 ? 1 : -1;
+                int err = dx - dy;
+
+                while (true)
+                {
+                    coordinates.Add((x1, y1));
+                    if (x1 == x2 && y1 == y2) break;
+                    int e2 = err * 2;
+                    if (e2 > -dy)
+                    {
+                        err -= dy;
+                        x1 += sx;
+                    }
+                    if (e2 < dx)
+                    {
+                        err += dx;
+                        y1 += sy;
+                    }
+                }
+            }
+
+            string[] InbetweenSquares = new string[coordinates.Count];
+
+            for (int i = 0; i < coordinates.Count; ++i)
+            {
+                (int x, int y) = coordinates.ElementAt(i);
+
+                InbetweenSquares[0] = CoordinatesToSquareName(x, y);
+            }
+
+            return InbetweenSquares;
+
+        }
         public string GetPieceCharacter(ChessPiece chessPiece)
         {
             string pieceCharacter = "";
@@ -819,13 +1096,42 @@ namespace ChessInterpreter
 
             return pieceCharacter;
         }
+        public BoardSquare[] FindChessPieceOnBoard(ChessPiece piece)
+        {
+            BoardSquare[] foundPieces = new BoardSquare[8];
+            int pieceCount = 0;
 
-        public void MovePiece(BoardSquare from, BoardSquare to)
+            for (int i = 0; i < Squares.GetLength(0); ++i)
+            {
+                for (int j = 0; j < Squares.GetLength(1); ++j)
+                {
+                    if (Squares[i, j].Piece == piece)
+                    {
+                        foundPieces[pieceCount] = Squares[i, j];
+                        pieceCount++;
+                    }
+                }    
+            }
+
+            return foundPieces;
+        }
+        public void MovePieceWithBoardSquareCoordinates(BoardSquare from, BoardSquare to)
         {
             to.Piece = from.Piece;
             from.Piece = new ChessPiece();
         }
 
+        //Board InitializationFunctions
+        private void InitializeSquareNames()
+        {
+            for (int i = 0; i < Squares.GetLength(0); i++)
+            {
+                for (int j = 0; j < Squares.GetLength(1); j++)
+                {
+                    Squares[i, j].Position = $"{Convert.ToChar((8 - i) + 96)}{8 - j}";
+                }
+            }
+        }
         public void InitializeEmptyBoard()
         {
             for (int i = 0; i < Squares.GetLength(0); i++)
@@ -836,7 +1142,6 @@ namespace ChessInterpreter
                 }
             }
         }
-
         public void InitializeDefaultBoard()
         {
             for (int i = 0; i < Squares.GetLength(0); i++)
@@ -879,7 +1184,6 @@ namespace ChessInterpreter
             Squares[7, 6].Piece = new ChessPiece(PieceType.Knight, PieceColor.White);
             Squares[7, 7].Piece = new ChessPiece(PieceType.Rook, PieceColor.White);
         }
-
         public void InitializeBoardFromFEN(string fen)
         {
             string[] fenParts = fen.Split(' ');
@@ -908,6 +1212,44 @@ namespace ChessInterpreter
             }
         }
 
+        //Position Name Conversion Functions - Functions to convert 'a1' to coordinates and back
+        public (int x, int y) SquareNameToCoordinates(string squareName)
+        {
+            // Convert the square name to lowercase for easier processing
+            squareName = squareName.ToLower();
+
+            // Check that the square name is in the correct format (e.g. "a1", "h8")
+            if (squareName.Length != 2 || !Char.IsLetter(squareName[0]) || !Char.IsDigit(squareName[1]))
+            {
+                throw new ArgumentException("Invalid square name");
+            }
+
+            // Convert the letter to an x-coordinate (a = 0, b = 1, etc.)
+            int x = squareName[0] - 'a';
+
+            // Convert the digit to a y-coordinate (1 = 7, 2 = 6, etc.)
+            int y = 7 - (squareName[1] - '1');
+
+            return (x, y);
+        }
+        public string CoordinatesToSquareName(int x, int y)
+        {
+            // Check that the coordinates are within the bounds of the chess board
+            if (x < 0 || x > 7 || y < 0 || y > 7)
+            {
+                throw new ArgumentOutOfRangeException("Invalid coordinates");
+            }
+
+            // Convert the x-coordinate to a letter (0 = a, 1 = b, etc.)
+            char letter = (char)('a' + x);
+
+            // Convert the y-coordinate to a digit (7 = 1, 6 = 2, etc.)
+            char digit = (char)('1' + (7 - y));
+
+            return letter.ToString() + digit.ToString();
+        }
+        
+        //Print Functions
         public void PrettyPrintChessBoard()
         {
             for (int i = 0; i < Squares.GetLength(0); i++)
@@ -933,6 +1275,17 @@ namespace ChessInterpreter
             }
             Console.WriteLine("   a  b  c  d  e  f  g  h ");
         }
+        public void Print()
+        {
+            for (int i = 0; i < Squares.GetLength(0); i++)
+            {
+                for (int j = 0; j < Squares.GetLength(1); j++)
+                {
+                    Squares[i, j].Print();
+                }
+            }
+        }
+
     }
 
     class PieceMove
@@ -945,6 +1298,7 @@ namespace ChessInterpreter
         public bool Checkmate { get; set; }
         public bool QCastle { get; set; }
         public bool KCastle { get; set; }
+        public bool PawnAttack { get; set; }
         public ChessPiece chessPiece { get; set; }
 
         public PieceMove()
@@ -983,12 +1337,241 @@ namespace ChessInterpreter
         public string Position { get; set; }
         public ChessPiece Piece { get; set; }
 
+        public BoardSquare()
+        {
+            Position = "a1";
+            Piece = new ChessPiece(PieceType.None, PieceColor.None);
+        }
+        
         public BoardSquare(string position, ChessPiece piece)
         {
             Position = position;
             Piece = piece;
         }
 
+        //Functions to return an array of positions that can be ATTACKED by the current piece. 
+        public string[] GetAttackingPositions()
+        {
+            string[] positions = new string[0];
+
+            switch (Piece.Type)
+            {
+                case PieceType.Pawn:
+                    break;
+                case PieceType.Bishop:
+                    break;
+                case PieceType.Knight:
+                    break;
+                case PieceType.Rook:
+                    break;
+                case PieceType.Queen:
+                    break;
+                case PieceType.King:
+                    break;
+
+            }
+
+            return positions;
+        }
+        public string[] GetPawnAttackingPositions()
+        {
+            string[] positions = new string[2];
+
+            if (Piece.Color == PieceColor.White)
+            {
+                positions[0] = ConvertPositionString(Position, 1, 1);
+                positions[0] = ConvertPositionString(Position, -1, 1);
+            }
+            else
+            {
+                positions[0] = ConvertPositionString(Position, 1, -1);
+                positions[0] = ConvertPositionString(Position, -1, -1);
+            }
+
+            return CleanPositionArrayOfInvalidPositions(positions);
+        }
+        public string[] GetBishopAttackingPositions()
+        {
+            string[] positions = new string[96];
+
+            for (int i = -4; i < 16; ++i)
+            {
+                positions[2*i + 8] = ConvertPositionString(Position, i, i);
+            }
+
+            for (int i = -4; i < 16; ++i)
+            {
+                positions[2 * i + 16] = ConvertPositionString(Position, i, -i);
+            }
+
+            for (int i = -4; i < 16; ++i)
+            {
+                positions[2 * i + 32] = ConvertPositionString(Position, -i, i);
+            }
+
+            for (int i = -4; i < 16; ++i)
+            {
+                positions[2 * i + 48] = ConvertPositionString(Position, -i, -i);
+            }
+
+            return CleanPositionArrayOfInvalidPositions(positions);
+        }
+        public string[] GetRookAttackingPositions()
+        {
+            string[] positions = new string[96];
+
+            for (int i = -7; i < 7; ++i)
+            {
+                positions[i+7] = ConvertPositionString(Position, i, 0);
+            }
+            for (int i = -7; i <7; ++i)
+            {
+                positions[i+21] = ConvertPositionString(Position, 0, i);
+            }
+
+            return CleanPositionArrayOfInvalidPositions(positions);
+        }
+        public string[] GetKnightAttackingPositions()
+        {
+            string[] positions = new string[8];
+
+            positions[0] = ConvertPositionString(Position, 2, 1);
+            positions[1] = ConvertPositionString(Position, -2, 1);
+            positions[2] = ConvertPositionString(Position, 2, -1);
+            positions[3] = ConvertPositionString(Position, -2, -1);
+            positions[4] = ConvertPositionString(Position, 1, 2);
+            positions[5] = ConvertPositionString(Position, -1, 2);
+            positions[6] = ConvertPositionString(Position, 1, -2);
+            positions[7] = ConvertPositionString(Position,- 1, -2);
+
+            return CleanPositionArrayOfInvalidPositions(positions);
+        }
+        public string[] GetKingAttackingPositions()
+        {
+            string[] positions = new string[8];
+
+            positions[0] = ConvertPositionString(Position, 0, 1);
+            positions[1] = ConvertPositionString(Position, 1, 0);
+            positions[2] = ConvertPositionString(Position, 1, 1);
+
+            positions[3] = ConvertPositionString(Position, 0, -1);
+            positions[4] = ConvertPositionString(Position, -1, 0);
+            positions[5] = ConvertPositionString(Position, -1, -1);
+
+            positions[6] = ConvertPositionString(Position, 1, -1);
+            positions[7] = ConvertPositionString(Position, -1, 1);
+
+            return CleanPositionArrayOfInvalidPositions(positions);
+        }
+        public string[] GetQueenAttackingPositions()
+        {
+            return MergeArrays(GetBishopAttackingPositions(), GetRookAttackingPositions());
+        }
+        
+        //Position Array Helper Functions
+        public string[] CleanPositionArrayOfInvalidPositions(string[] positions)
+        {
+            int nullCounter = 0;
+            
+            for (int i = 0; i < positions.Length; ++i)
+            {
+                if (!CheckIfRealPosition(positions[i]))
+                {
+                    positions[i] = null;
+                    nullCounter++;
+                }
+            }
+
+            string[] newPositions = new string[positions.Length - nullCounter];
+            int arrayCursor = 0;
+
+            for (int i = 0; i < positions.Length; ++i)
+            {
+                if (positions[i] != null)
+                {
+                    newPositions[arrayCursor] = positions[i];
+                    arrayCursor++;
+                }
+            }
+
+            return RemoveSelfPosition(RemoveDuplicates(newPositions), this.Position);
+        }
+        public string[] MergeArrays(string[] arr1, string[] arr2)
+        {
+            string[] arr3 = new string[arr1.Length + arr2.Length];
+            arr1.CopyTo(arr3, 0);
+            arr2.CopyTo(arr3, arr1.Length);
+            return arr3;
+        }
+        public string[] RemoveDuplicates(string[] arr)
+        {
+            System.Collections.ArrayList newList = new System.Collections.ArrayList();
+
+            foreach (string str in arr)
+                if (!newList.Contains(str))
+                    newList.Add(str);
+            return (string[])newList.ToArray(typeof(string));
+        }
+        public string[] RemoveSelfPosition(string[] arr, string selfPosition)
+        {
+            bool found = false;
+
+            for (int i = 0; i < arr.Length; ++i)
+            {
+                if (arr[i] == selfPosition)
+                {
+                    arr[i] = null;
+                    found = true;
+                }
+            }
+
+            if (found)
+            {
+                string[] arr2 = new string[arr.Length - 1];
+                int j = 0;
+
+                for (int i = 0; i < arr.Length; ++i)
+                {
+                    if (arr[i] != null)
+                    {
+                        arr[i] = arr2[j];
+                        j++;
+                    }
+                }
+
+                return arr2;
+            }
+
+            return arr;
+        }
+       
+        //Position String Functions
+        public static string ConvertPositionString(string position, int deltaX, int deltaY)
+        {
+            string newPosition = "";
+
+            try
+            {
+                newPosition += Convert.ToChar(Convert.ToInt32(position[0]) + deltaX);
+
+                newPosition += Convert.ToString(Int32.Parse((position[1]) + "") + deltaY);
+
+                return newPosition;
+            }
+            catch (Exception e)
+            {
+                return "00";
+            }
+        }
+        public static bool CheckIfRealPosition(string position)
+        {
+            if (position != null)
+                if ("abcdefgh".Contains(Char.ToLower(position[0])))
+                    if ("12345678".Contains(position[1]))
+                        if (position.Length == 2)
+                            return true;
+            return false;
+        }
         public void Print()
         {
             Console.WriteLine($"Position: {Position}, Piece: {Piece}");
