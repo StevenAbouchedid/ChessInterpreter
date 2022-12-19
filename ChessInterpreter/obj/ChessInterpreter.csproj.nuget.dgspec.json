@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\steve\\source\\repos\\ChessInterpreter\\ChessInterpreter\\ChessInterpreter.csproj": {}
+    "C:\\Users\\Steven\\Documents\\GitHub\\ChessInterpreter\\ChessInterpreter\\ChessInterpreter.csproj": {}
   },
   "projects": {
-    "C:\\Users\\steve\\source\\repos\\ChessInterpreter\\ChessInterpreter\\ChessInterpreter.csproj": {
+    "C:\\Users\\Steven\\Documents\\GitHub\\ChessInterpreter\\ChessInterpreter\\ChessInterpreter.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\steve\\source\\repos\\ChessInterpreter\\ChessInterpreter\\ChessInterpreter.csproj",
+        "projectUniqueName": "C:\\Users\\Steven\\Documents\\GitHub\\ChessInterpreter\\ChessInterpreter\\ChessInterpreter.csproj",
         "projectName": "ChessInterpreter",
-        "projectPath": "C:\\Users\\steve\\source\\repos\\ChessInterpreter\\ChessInterpreter\\ChessInterpreter.csproj",
-        "packagesPath": "C:\\Users\\steve\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\steve\\source\\repos\\ChessInterpreter\\ChessInterpreter\\obj\\",
+        "projectPath": "C:\\Users\\Steven\\Documents\\GitHub\\ChessInterpreter\\ChessInterpreter\\ChessInterpreter.csproj",
+        "packagesPath": "C:\\Users\\Steven\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Steven\\Documents\\GitHub\\ChessInterpreter\\ChessInterpreter\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\steve\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Steven\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -49,7 +45,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -58,7 +55,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.409\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

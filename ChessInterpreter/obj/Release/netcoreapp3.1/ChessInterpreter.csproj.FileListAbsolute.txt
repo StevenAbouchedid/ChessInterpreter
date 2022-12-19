@@ -12,3 +12,17 @@ C:\Users\steve\source\repos\ChessInterpreter\ChessInterpreter\obj\Release\netcor
 C:\Users\steve\source\repos\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.pdb
 C:\Users\steve\source\repos\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.genruntimeconfig.cache
 C:\Users\steve\source\repos\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.csproj.AssemblyReference.cache
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\bin\Release\netcoreapp3.1\ChessInterpreter.exe
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\bin\Release\netcoreapp3.1\ChessInterpreter.deps.json
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\bin\Release\netcoreapp3.1\ChessInterpreter.runtimeconfig.json
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\bin\Release\netcoreapp3.1\ChessInterpreter.runtimeconfig.dev.json
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\bin\Release\netcoreapp3.1\ChessInterpreter.dll
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\bin\Release\netcoreapp3.1\ChessInterpreter.pdb
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.csproj.AssemblyReference.cache
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.AssemblyInfoInputs.cache
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.AssemblyInfo.cs
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.csproj.CoreCompileInputs.cache
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.dll
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.pdb
+C:\Users\Steven\Documents\GitHub\ChessInterpreter\ChessInterpreter\obj\Release\netcoreapp3.1\ChessInterpreter.genruntimeconfig.cache
