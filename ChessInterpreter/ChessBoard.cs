@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace ChessInterpreter
 {
@@ -51,13 +50,23 @@ namespace ChessInterpreter
         // This function will take as input a move in algebraic chess notation and compute the move and play it on the chess board. 
         public void PlayMove(string ChessNotationString)
         {
-            PieceMove parsedMove;
-
-
             try
             {
-               parsedMove = Board.StandardAlgebraicNotationParser(ChessNotationString, playerTurn);
-               
+                //Parse Move
+                PieceMove parsedMove = Board.StandardAlgebraicNotationParser(ChessNotationString, playerTurn);
+                
+                //Interpret move
+                PieceMove ContextParsedMove = ParsedMoveContextInterpreter(parsedMove);
+                
+                //Compile Move
+                MakeMoveInGame(ContextParsedMove);
+
+                //Switch Turns
+                if (playerTurn == PieceColor.White)
+                    playerTurn = PieceColor.Black;
+                else
+                    playerTurn = PieceColor.White;
+
             }
             catch (Exception e)
             {
@@ -65,60 +74,109 @@ namespace ChessInterpreter
                 Console.WriteLine("Invalid move, please try again");
                 return;
             }
-
-            
-            //need to continue work on PaesedMoveContextInterpreter to reduce down to one move. 
-
-
         }
 
         // Interprets a parsed move with the context of the current board state and plays the move on the board.
-        private void ParsedMoveContextInterpreter(PieceMove pieceMove)
+        private PieceMove ParsedMoveContextInterpreter(PieceMove pieceMove)
         {
+            //Uses Interpreter to get an array of legal moves based on the parsed move
             PieceMove[] LegalMoves = Board.StandardAlgebraicNotationInterpreter(pieceMove);
 
-            
+            //New list to check for legal moves with context
+            List<PieceMove> LegalMovesWithContext = new List<PieceMove>();
+
+            //Filters for context legal moves and adds them to list
+            for (int i = 0; i < LegalMoves.Length; ++i)
+                if (CheckIfLegalMove(LegalMoves[i]))
+                    LegalMovesWithContext.Add(LegalMoves[i]);
+
+            for (int i = 0; i < LegalMovesWithContext.Count; ++i)
+            {
+                Console.Write("Legal Moves Based on Context: ");
+                Console.WriteLine(LegalMovesWithContext.ElementAt(i));
+            }
+
+            if (LegalMovesWithContext.Count > 1)
+            {
+                Console.WriteLine("Error, too many legal moves");
+                return null;
+            }
+            else if (LegalMovesWithContext.Count < 1)
+            {
+                Console.WriteLine("Error, no legal move entered");
+                return null;
+            }
+            else
+                return LegalMovesWithContext.ElementAt(0);
         }
 
         public bool CheckIfLegalMove(PieceMove pieceMove)
         {
+            //Check for Null
             if (pieceMove == null)
-            {
                 return false;
-            }
 
+            //Check for empty move squares
+            if (pieceMove.From == "" || pieceMove.To == "")
+                return false;
+
+            //Get Context about piece squares from board
+            BoardSquare departureSquare = board.GetSquareByName(pieceMove.From);
             BoardSquare destinationSquare = board.GetSquareByName(pieceMove.To);
 
-            if (destinationSquare == null)
-            {
+            //Check for Null
+            if (destinationSquare == null || departureSquare == null)
                 return false;
-            }
 
+            if (departureSquare.Piece.Type == PieceType.None)
+                return false;
+
+            //Make sure the original square has the actual piece being moved
+            if (departureSquare.Piece.Type != pieceMove.chessPiece.Type || departureSquare.Piece.Color != pieceMove.chessPiece.Color)
+                return false;
+
+            //Move cannot be made if destination is friendly piece
             if (destinationSquare.Piece.Color == playerTurn)
-            {
                 return false;
-            }
 
-            if (pieceMove.chessPiece.Type == PieceType.Pawn)
-                if (!pieceMove.PawnAttack)
-                    return false;
-
-            //need to consider checks
+            // Need to consider checks
+            // The move needs to remove check if the player is in check
             if (check)
-                if (CheckIfMoveRemovesCheck(board, pieceMove))
+                if (!MoveRemovesCheck(board, pieceMove))
                     return false;
             
-
+            // If all conditions are satisfied, then the move is legal
             return true;
 
         }
 
         //Checks if the board is still in a checked state after a move
-        public bool CheckIfMoveRemovesCheck(Board currentBoard, PieceMove move)
+        public bool MoveRemovesCheck(Board currentBoard, PieceMove move)
         {
+            //Make move on temp Board Object
+            Board newBoard = MakeMove(currentBoard, move);
 
-            return false;
+            //Check if the move gets the turn player out of check
+            return !newBoard.CheckForChecks(playerTurn);
         }
+
+        public void MakeMoveInGame(PieceMove move)
+        {
+            try
+            {
+                board.MovePieceWithBoardSquareCoordinates(board.GetSquareByName(move.From), board.GetSquareByName(move.To));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Move not made, please try again");
+            }
+        }
+        public Board MakeMove(Board chessBoard, PieceMove move)
+        {
+            Board changedChessBoard = chessBoard;
+            changedChessBoard.MovePieceWithBoardSquareCoordinates(changedChessBoard.GetSquareByName(move.From), changedChessBoard.GetSquareByName(move.To));
+            return changedChessBoard;
+        } 
 
     }
     
@@ -291,7 +349,6 @@ namespace ChessInterpreter
                 case 1:
                     toSquare = toSquare + "1";
                     break;
-
             }
 
 
@@ -377,7 +434,7 @@ namespace ChessInterpreter
             }
             else
             {
-                if (toSquareY == 4)
+                if (toSquareY == 5)
                 {
                     moves = new PieceMove[4];
                     moves[0] = new PieceMove(toSquare[0]+"6", toSquare, false, "", false, false, false, false, chessPiece);
@@ -416,10 +473,10 @@ namespace ChessInterpreter
                 {
                     if (moves[i] != null)
                     {
-                        switch (moves[i].From.Length)
+                        switch (fromSquare.Length)
                         {
                             case 1:
-                                if (moves[i].From[0] != fromSquare[0] && moves[i].From[1] != fromSquare[1])
+                                if (moves[i].From[0] != fromSquare[0] && moves[i].From[1] != fromSquare[0])
                                 {
                                     moves[i] = null;
                                 }
@@ -1128,7 +1185,7 @@ namespace ChessInterpreter
             {
                 for (int j = 0; j < Squares.GetLength(1); j++)
                 {
-                    Squares[i, j].Position = $"{Convert.ToChar((8 - i) + 96)}{8 - j}";
+                    Squares[i, j].Position = CoordinatesToSquareName(j,i);
                 }
             }
         }
@@ -1183,6 +1240,8 @@ namespace ChessInterpreter
             Squares[7, 5].Piece = new ChessPiece(PieceType.Bishop, PieceColor.White);
             Squares[7, 6].Piece = new ChessPiece(PieceType.Knight, PieceColor.White);
             Squares[7, 7].Piece = new ChessPiece(PieceType.Rook, PieceColor.White);
+
+            InitializeSquareNames();
         }
         public void InitializeBoardFromFEN(string fen)
         {
@@ -1281,6 +1340,7 @@ namespace ChessInterpreter
             {
                 for (int j = 0; j < Squares.GetLength(1); j++)
                 {
+                    Console.Write($"Square {i},{j}");
                     Squares[i, j].Print();
                 }
             }
